@@ -155,6 +155,10 @@ struct LedHandler : std::enable_shared_from_this<LedHandler> {
     , m_commands{ cmd_list }
     {}
 
+    ~LedHandler() {
+        std::cerr << "~Handler\n";
+    }
+
     tcp::socket& socket () {
         return m_socket;
     }
@@ -216,7 +220,7 @@ protected:
     }
 
     void initiate_send () {
-        // std::cerr<< "SENDING...";
+        std::cerr<< "SENDING...";
         // for (auto && m : m_send_queue) {
         //     std::cerr << m;
         // }
@@ -238,8 +242,8 @@ protected:
             m_send_queue.pop_front();
             if (!m_send_queue.empty()) { initiate_send(); }
             else {
-                return;
                 std::cerr << "SENDING DONE.\n";
+                return;
                 //read_some();
             }
         }
