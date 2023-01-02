@@ -16,8 +16,12 @@ Server displays the current LED state.
 - rate?  | returns the current LED rate
 
 ## Usage example:
-make server
+```
+make server  
 ./server 1234
+```
 
+```
 make client
 ./client 127.0.0.1 1234
+```
