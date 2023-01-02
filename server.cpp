@@ -131,7 +131,6 @@ struct Led {
         }
         os << " " << light.get_rate();
         for (std::size_t i=0; i<light.get_rate(); ++i) os << ".";
-        // os << "\n";
         return os;
     }
 
