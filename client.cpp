@@ -40,18 +40,19 @@ int main() {
             msg = "get-led-state\n";
         } else if (command == "color?") {
             msg = "get-led-color\n";
-        } else if (command == "red") {
-            msg = "set-led-color red\n";
-        } else if (command == "green") {
-            msg = "set-led-color green\n";
-        } else if (command == "blue") {
-            msg = "set-led-color blue\n";
+        } else if (command == "color") {
+            std::string color;
+            std::cin >> color;
+            msg = "set-led-color " + color + "\n";
         } else if (command == "rate") {
             int new_rate;
             std::cin >> new_rate;
             std::cerr << new_rate;
             msg = std::string("set-led-rate ") + std::to_string(new_rate) + "\n";
-        } else {
+        } else if (command == "rate?") {
+            msg = "get-led-rate\n";
+        }
+        else {
             std::cerr << "Wrong command\n";
             continue;
         }
