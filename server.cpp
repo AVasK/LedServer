@@ -25,13 +25,11 @@ struct LedCommands {
 
     std::string parse (Led & led, std::string const& msg) {
         for (auto const& [cmd, action] : m_commands) {
-            //std::cerr << "cmd|recv: " << cmd << "|" << msg << "\n";
             const auto at = msg.find(cmd);
             if (at != 0) continue;
             auto from = std::strlen(cmd);
             if (from >= msg.size()) return action(led, "");
             auto arg = msg.substr(from + 1);
-            //std::cerr << "[arg: " << arg << "] ";
             return action(led, arg);
         }
         return "FAILED";
@@ -79,7 +77,6 @@ struct Led {
     }
 
     bool set_state (std::string const& sstate) {
-        //std::cerr << "set_state " << sstate << "\n";
         if (sstate == "on") {
             m_state = State::on;
             return true;
@@ -95,7 +92,6 @@ struct Led {
     }
 
     bool set_color (std::string const& scolor) {
-        //std::cerr << "set_color " << scolor << "\n";
         if (scolor == "red") {
             m_color = Color::red;
             return true;
@@ -114,7 +110,6 @@ struct Led {
     }
 
     bool set_rate (std::string const& srate) {
-        //std::cerr << "set_rate " << srate << "\n";
         const auto rate = std::stol(srate);
         return m_rate.set( rate );
     }
@@ -320,8 +315,8 @@ private:
                               , boost::system::error_code const& error) 
     {
         if (error) {
-            std::cerr << "!ERR: " << error.what();
-            //return; 
+            std::cerr << "Error while handling new connection: " << error.what();
+            return; 
         }
         handler->start();
         accept_new();
@@ -370,9 +365,14 @@ static LedCommands list {
 
 static Led light;
 
-int main() {
+int main(int argc, char * argv[]) {
+    if (argc < 2) {
+        std::cout << "usage: ./server server_port\n";
+        return 0;
+    }
+
     asio::io_service io;
-    Server<LedHandler> server {io, 1234, light, list};
+    Server<LedHandler> server (io, std::stoi(argv[1]), light, list);
     std::thread light_monitor ([] {
         for (;;) { std::cerr << "             \r" << light; sleep(1); }
     });

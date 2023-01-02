@@ -23,14 +23,24 @@ std::string recv (tcp::socket & socket, boost::system::error_code & error) {
     }
 }
 
-int main() {
+int main(int argc, char * argv[]) {
     asio::io_service io;
+
+    if (argc < 3) {
+        std::cout << "usage: ./client server_address server_port\n";
+        return 0;
+    }
     
     boost::system::error_code err;
     std::string command, msg;
     for (;;) {
         tcp::socket socket(io);
-        socket.connect( tcp::endpoint( asio::ip::address::from_string("127.0.0.1"), 1234 ));
+        try {
+            socket.connect( tcp::endpoint( asio::ip::address::from_string(argv[1]), std::stoi(argv[2]) ));
+        } catch(boost::system::system_error & err) {
+            std::cerr << "Cannot connect to the server: " << err.what();
+            break;
+        } 
         std::cin >> command;
         if (command == "on") {
             msg = "set-led-state on\n";
