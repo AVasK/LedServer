@@ -156,7 +156,8 @@ struct LedHandler : std::enable_shared_from_this<LedHandler> {
     {}
 
     ~LedHandler() {
-        std::cerr << "~Handler\n";
+        // std::cerr << "~Handler\n";
+        m_socket.close();
     }
 
     tcp::socket& socket () {
@@ -179,7 +180,7 @@ struct LedHandler : std::enable_shared_from_this<LedHandler> {
 
 protected:
     void read_some () {
-        std::cerr << "READING...\n";
+        // std::cerr << "READING...\n";
         m_socket.async_read_some(
             asio::buffer(m_input),
             [self=shared_from_this()]
@@ -196,17 +197,16 @@ protected:
         m_message += message;
 
         if (message.find('\n') == std::string::npos) {
-            std::cerr << "...received part...: " << message << "\n";
+            // std::cerr << "...received part...: " << message << "\n";
             read_some();
         } else {
             while (!m_message.empty()) {
                 auto newline = m_message.find('\n');
                 auto cmd = m_message.substr(0, newline);
                 m_message = m_message.substr(newline+1);
-                std::cerr << "SERVER RECEIVED: \"" << cmd << "\"\n";
+                // std::cerr << "SERVER RECEIVED: \"" << cmd << "\"\n";
                 auto res = m_commands.parse( m_light, cmd );
                 send(res+"\n");
-                // std::cerr << ">> " << res << "\n";
             }
         }
     }
@@ -220,10 +220,7 @@ protected:
     }
 
     void initiate_send () {
-        std::cerr<< "SENDING...";
-        // for (auto && m : m_send_queue) {
-        //     std::cerr << m;
-        // }
+        // std::cerr<< "SENDING...";
         m_send_queue.front() += "\0";
         async_write( 
             m_socket, 
@@ -242,9 +239,8 @@ protected:
             m_send_queue.pop_front();
             if (!m_send_queue.empty()) { initiate_send(); }
             else {
-                std::cerr << "SENDING DONE.\n";
+                // std::cerr << "SENDING DONE.\n";
                 return;
-                //read_some();
             }
         }
     }
